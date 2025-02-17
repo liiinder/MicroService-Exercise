@@ -1,6 +1,3 @@
-var builder = WebApplication.CreateBuilder(args);
-var app = builder.Build();
-
 List<Booking> bookings = [
     new Booking(1, 1, 2),
     new Booking(2, 2, 1),
@@ -12,6 +9,30 @@ List<Booking> bookings = [
     new Booking(8, 4, 3),
     new Booking(9, 19, 1)
 ];
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddOpenApiDocument(config =>
+{
+    config.DocumentName = "Minimal API";
+    config.Title = "MinimalAPI v1";
+    config.Version = "v1";
+});
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseOpenApi();
+    app.UseSwaggerUi(config =>
+    {
+        config.DocumentTitle = "MinimalAPI";
+        config.Path = "/swagger";
+        config.DocumentPath = "/swagger/{documentName}/swagger.json";
+        config.DocExpansion = "list";
+    });
+}
 
 app.MapGet("/bookings", () => bookings);
 
