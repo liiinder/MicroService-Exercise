@@ -45,26 +45,26 @@ app.MapPost("/gateway/customers", async (Customer customer) =>
     return response.IsSuccessStatusCode ? Results.Created() : Results.Problem("Failed to update customer");
 });
 
-app.MapGet("/gateway/bookings", async () => 
-{
-    return await httpClient.GetStringAsync("http://localhost:5140/bookings");
-});
-app.MapPut("/gateway/bookings/{}", async () => 
-{
-    return await httpClient.GetStringAsync("http://localhost:5140/bookings");
-});
-app.MapGet("/gateway/bookings", async () => 
-{
-    return await httpClient.GetStringAsync("http://localhost:5140/bookings");
-});
+// app.MapGet("/gateway/bookings", async () => 
+// {
+//     return await httpClient.GetStringAsync("http://localhost:5140/bookings");
+// });
+// app.MapPut("/gateway/bookings/{}", async () => 
+// {
+//     return await httpClient.GetStringAsync("http://localhost:5140/bookings");
+// });
+// app.MapGet("/gateway/bookings", async () => 
+// {
+//     return await httpClient.GetStringAsync("http://localhost:5140/bookings");
+// });
 
 
 
 
 
 
-• AddBooking
-• DeleteBooking
+// AddBooking
+// DeleteBooking
 
 
 
@@ -72,3 +72,12 @@ app.MapGet("/gateway/bookings", async () =>
 
 
 app.Run();
+
+class Customer
+{
+public int Id { get; set; }
+public required string FirstName { get; set; }
+public required string LastName { get; set; }
+public required string Email { get; set; }
+public required string Membership { get; set; }
+}
