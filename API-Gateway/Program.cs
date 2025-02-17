@@ -23,52 +23,56 @@ if (app.Environment.IsDevelopment())
 
 var httpClient = new HttpClient();
 
+//Customers
+
 app.MapGet("/gateway/customers", async () =>  
 {
-    return await httpClient.GetStringAsync("http://localhost:5065/customers");
+    return await httpClient.GetStringAsync("http://localhost:5140/customers");
 });
 
 app.MapGet("/gateway/customers/{id}", async (int id) =>  
 {
-    return await httpClient.GetStringAsync($"http://localhost:5065/customers/{id}");
+    return await httpClient.GetStringAsync($"http://localhost:5140/customers/{id}");
 });
 
 app.MapPut("/gateway/customers", async (Customer customer) =>
 {
-    var response = await httpClient.PutAsJsonAsync("http://localhost:5065/customers", customer);
+    var response = await httpClient.PutAsJsonAsync("http://localhost:5140/customers", customer);
     return response.IsSuccessStatusCode ? Results.Ok() : Results.Problem("Failed to update customer");
 });
 
 app.MapPost("/gateway/customers", async (Customer customer) =>
 {
-    var response = await httpClient.PutAsJsonAsync("http://localhost:5065/customers", customer);
+    var response = await httpClient.PostAsJsonAsync("http://localhost:5140/customers", customer);
+    return response.IsSuccessStatusCode ? Results.Created() : Results.Problem("Failed to add customer");
+});
+
+
+//Bookings
+
+//Get all
+app.MapGet("/gateway/bookings", async () => 
+{
+    return await httpClient.GetStringAsync("http://localhost:5003/bookings");
+});
+//Get by id
+app.MapPut("/gateway/bookings/{id}", async (int id) => 
+{
+    return await httpClient.GetStringAsync($"http://localhost:5003/bookings/{id}");
+});
+
+//Post
+app.MapPost("/gateway/bookings", async (Booking booking) => 
+{
+    var response = await httpClient.PostAsJsonAsync("http://localhost:5003/bookings", booking);
     return response.IsSuccessStatusCode ? Results.Created() : Results.Problem("Failed to update customer");
 });
 
-// app.MapGet("/gateway/bookings", async () => 
-// {
-//     return await httpClient.GetStringAsync("http://localhost:5140/bookings");
-// });
-// app.MapPut("/gateway/bookings/{}", async () => 
-// {
-//     return await httpClient.GetStringAsync("http://localhost:5140/bookings");
-// });
-// app.MapGet("/gateway/bookings", async () => 
-// {
-//     return await httpClient.GetStringAsync("http://localhost:5140/bookings");
-// });
 
-
-
-
-
-
-// AddBooking
-// DeleteBooking
-
-
-
-
+app.MapDelete("/gateway/bookings/{id}", async (int id) =>
+{
+    return await httpClient.DeleteAsync($"http://localhost:5003/bookings/{id}");
+});
 
 
 app.Run();
@@ -81,3 +85,19 @@ public required string LastName { get; set; }
 public required string Email { get; set; }
 public required string Membership { get; set; }
 }
+
+public class Booking {
+
+    public int Id { get; set; }
+    public int CustomerId { get; set; }
+    public int RoomId { get; set; }
+    
+    public Booking(int id, int customerId, int roomId)
+    {
+        Id = id;
+        CustomerId = customerId;
+        RoomId = roomId;
+    }
+    
+app.Run();
+
