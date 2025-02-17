@@ -47,6 +47,7 @@ app.MapPost("/gateway/customers", async (Customer customer) =>
     return response.IsSuccessStatusCode ? Results.Created() : Results.Problem("Failed to add customer");
 });
 
+
 //Bookings
 
 //Get all
@@ -74,10 +75,6 @@ app.MapDelete("/gateway/bookings/{id}", async (int id) =>
 });
 
 
-
-
-
-
 app.Run();
 
 class Customer
@@ -102,4 +99,5 @@ public class Booking {
         RoomId = roomId;
     }
     
-}
+app.Run();
+
