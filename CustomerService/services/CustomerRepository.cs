@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 public class CustomerRepository : ICustomerRepository
 {
-    private readonly List<Customer> _customers = new () {
+    private readonly List<Customer> _customers = new() {
     new Customer{ Id =1, FirstName = "Adam", LastName="Agerling", Email="Adam.Agerling@Swagmail.com", Membership="Premium"},
     new Customer{ Id =2, FirstName = "Johannes", LastName="Breitfeldt", Email="Johannes.Breitfeldt@Swagmail.com", Membership="Gold"},
     new Customer{ Id =3, FirstName = "Kristoffer", LastName="Liiinder", Email="Kristoffer.Liiinder@Swagmail.com", Membership="Silver"},
@@ -25,7 +25,7 @@ public class CustomerRepository : ICustomerRepository
     public void Update(Customer customer)
     {
         var existingCustomer = _customers.FirstOrDefault(c => c.Id == customer.Id);
-        if(existingCustomer != null)
+        if (existingCustomer != null)
         {
             existingCustomer.FirstName = customer.FirstName;
             existingCustomer.LastName = customer.LastName;
@@ -38,7 +38,7 @@ public class CustomerRepository : ICustomerRepository
     {
         var customer = _customers.FirstOrDefault(c => c.Id == id);
 
-        if(customer != null)
+        if (customer != null)
         {
             _customers.Remove(customer);
         }

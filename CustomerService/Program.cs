@@ -22,25 +22,26 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-
-
 app.MapGet("/customers", (ICustomerRepository customers) => customers.GetAll());
 
-app.MapGet("/customers/{id}", (int id, ICustomerRepository customers) => {
+app.MapGet("/customers/{id}", (int id, ICustomerRepository customers) =>
+{
     var customer = customers.GetById(id);
-    if (customer is null) 
+    if (customer is null)
     {
         return Results.NotFound("The user was not found");
     }
     return Results.Ok(customer);
 });
 
-app.MapPost("/customers", (Customer customer, ICustomerRepository customers) => {
+app.MapPost("/customers", (Customer customer, ICustomerRepository customers) =>
+{
     customers.Add(customer);
     return Results.Created($"/customers/{customer.Id}", customer);
 });
 
-app.MapPut("/customers/{id}", (int id, Customer updatedCustomer, ICustomerRepository customers) => {
+app.MapPut("/customers/{id}", (int id, Customer updatedCustomer, ICustomerRepository customers) =>
+{
     var existingCustomer = customers.GetById(id);
     if (existingCustomer is null)
     {
@@ -51,7 +52,8 @@ app.MapPut("/customers/{id}", (int id, Customer updatedCustomer, ICustomerReposi
 });
 
 
-app.MapDelete("/customers/{id}", (int id, ICustomerRepository customers) => {
+app.MapDelete("/customers/{id}", (int id, ICustomerRepository customers) =>
+{
     var existingCustomer = customers.GetById(id);
     if (existingCustomer is null)
     {
