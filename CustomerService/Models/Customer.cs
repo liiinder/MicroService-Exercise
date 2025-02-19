@@ -7,9 +7,8 @@ public class Customer
     public required string Membership { get; set; }
 
     public Customer() { }
-    get; set; }
 
-public Customer(int id, string firstName, string lastName, string email, string membership)
+    public Customer(int id, string firstName, string lastName, string email, string membership)
     {
         Id = id;
         FirstName = firstName;
