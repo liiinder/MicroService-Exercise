@@ -1,6 +1,5 @@
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApiDocument(config =>
 {
@@ -8,6 +7,8 @@ builder.Services.AddOpenApiDocument(config =>
     config.Title = "MinimalAPI v1";
     config.Version = "v1";
 });
+
+builder.Services.AddSingleton<IBookingRepository, BookingRepository>();
 
 var app = builder.Build();
 
@@ -23,47 +24,16 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.MapGet("/bookings", (IBookingRepository booking) => booking.GetAll());
+app.MapGet("/", () => "Hello World");
 
-app.MapGet("/bookings/{id}", (int id) => {
-    var booking = bookings.FirstOrDefault(o => o.Id == id);
-    if (booking is null)
-    {
-        return Results.NotFound("Booking not found");
-    }
-    return Results.Ok(booking);
-});
+app.MapGet("/bookings", (IBookingRepository service) => service.GetAll());
 
-app.MapPost("/bookings", (Booking booking) => {
-    bookings.Add(booking);
+app.MapGet("/bookings/{id}", (IBookingRepository service, int id) => service.GetById(id));
 
-    return Results.Created("/bookings/{bookings.id}", booking);
-});
+app.MapPost("/bookings", (IBookingRepository service, Booking booking) => service.Add(booking));
 
-app.MapPut("/bookings/{id}", (int id, Booking booking) => {
-    var preupdate = bookings.FirstOrDefault(o => o.Id == id);
+app.MapPut("/bookings", (IBookingRepository service, Booking booking) => service.Update(booking));
 
-    if (preupdate is null)
-    {
-        return Results.NotFound("Booking not found");
-    }
-    
-    preupdate.CustomerId = booking.CustomerId;
-    preupdate.RoomId = booking.RoomId;
-
-    return Results.Ok("/bookings/{bookings.id} Updated");
-});
-
-app.MapDelete("/bookings/{id}", (int id) =>
-{
-    var toBeDeleted = bookings.FirstOrDefault(o => o.Id == id);
-    if (toBeDeleted is null)
-    {
-        return Results.NotFound("Booking not found");
-    }
-
-    bookings.Remove(toBeDeleted);
-    return Results.Ok("Booking deleted");
-});
+app.MapDelete("/bookings/{id}", (IBookingRepository service, int id) => service.Delete(id));
 
 app.Run();
