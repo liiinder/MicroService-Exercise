@@ -1,57 +1,65 @@
 var builder = WebApplication.CreateBuilder(args);
-var app = builder.Build();
-
-List<Customer> customers = new () 
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddOpenApiDocument(config =>
 {
-    new Customer{ Id =1, FirstName = "Adam", LastName="Agerling", Email="Adam.Agerling@Swagmail.com", Membership="Premium"},
-    new Customer{ Id =2, FirstName = "Johannes", LastName="Breitfeldt", Email="Johannes.Breitfeldt@Swagmail.com", Membership="Gold"},
-    new Customer{ Id =3, FirstName = "Kristoffer", LastName="Liiinder", Email="Kristoffer.Liiinder@Swagmail.com", Membership="Silver"},
-};
-
-app.MapGet("/customers", () => customers );
-
-app.MapGet("/customers/{id}", (int id) => 
-{
-   var customer = customers.FirstOrDefault(c => c.Id == id);
-    if(customer == null) 
-    {
-     return Results.NotFound("Customer not found");
-    }
-   return Results.Ok(customer);
-} );
-
-app.MapPost("/customers", (Customer customer) => 
-{
-    customers.Add(customer);
-    return Results.Created("/customers/{customer.id}", customer);
-} );
-
-app.MapPut("/customers/{id}", (int id, Customer updatedCustomer) => {
-    var customer = customers.FirstOrDefault(c => c.Id == id);
-    if (customer is null) return Results.NotFound("The user was not found");
-    customer.FirstName = updatedCustomer.FirstName;
-    customer.LastName = updatedCustomer.LastName;
-    customer.Email = updatedCustomer.Email;
-    customer.Membership = updatedCustomer.Membership; 
-    return Results.Ok();
+    config.DocumentName = "Minimal API";
+    config.Title = "MinimalAPI v1";
+    config.Version = "v1";
 });
 
-app.MapDelete("/customers/{id}", (int id) => {
-    var customer = customers.FirstOrDefault(c => c.Id == id);
+var app = builder.Build();
 
-    customers.Remove(customer);
-    return Results.Ok(id);
+if (app.Environment.IsDevelopment())
+{
+    app.UseOpenApi();
+    app.UseSwaggerUi(config =>
+    {
+        config.DocumentTitle = "MinimalAPI";
+        config.Path = "/swagger";
+        config.DocumentPath = "/swagger/{documentName}/swagger.json";
+        config.DocExpansion = "list";
     });
+}
 
+
+
+app.MapGet("/customers", (ICustomerRepository customers) => customers.GetAll());
+
+app.MapGet("/customers/{id}", (int id, ICustomerRepository customers) => {
+    var customer = customers.GetById(id);
+    if (customer is null) 
+    {
+        return Results.NotFound("The user was not found");
+    }
+    return Results.Ok(customer);
+});
+
+app.MapPost("/customers", (Customer customer, ICustomerRepository customers) => {
+    customers.Add(customer);
+    return Results.Created($"/customers/{customer.Id}", customer);
+});
+
+app.MapPut("/customers/{id}", (int id, Customer updatedCustomer, ICustomerRepository customers) => {
+    var existingCustomer = customers.GetById(id);
+    if (existingCustomer is null)
+    {
+        return Results.NotFound("The user was not found");
+    }
+    customers.Update(updatedCustomer);
+    return Results.Ok(updatedCustomer);
+});
+
+
+app.MapDelete("/customers/{id}", (int id, ICustomerRepository customers) => {
+    var existingCustomer = customers.GetById(id);
+    if (existingCustomer is null)
+    {
+        return Results.NotFound("The user was not found");
+    }
+    customers.Delete(id);
+    return Results.Ok("The user was deleted");
+});
 
 app.Run();
 
-//test
-class Customer
-{
-public int Id { get; set; }
-public required string FirstName { get; set; }
-public required string LastName { get; set; }
-public required string Email { get; set; }
-public required string Membership { get; set; }
-}
