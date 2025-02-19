@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
@@ -42,6 +43,7 @@ public class BookingRepository : IBookingRepository
 	{
         var preupdate = bookings.FirstOrDefault(o => o.Id == booking.Id);
 
+        Console.WriteLine($"Does it run here? {booking.Id}");
         if (preupdate is null)
         {
             return Results.NotFound("Booking not found");

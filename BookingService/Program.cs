@@ -1,6 +1,5 @@
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApiDocument(config =>
 {
@@ -8,6 +7,8 @@ builder.Services.AddOpenApiDocument(config =>
     config.Title = "MinimalAPI v1";
     config.Version = "v1";
 });
+
+builder.Services.AddSingleton<IBookingRepository, BookingRepository>();
 
 var app = builder.Build();
 
@@ -23,14 +24,16 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.MapGet("/", () => "Hello World");
+
 app.MapGet("/bookings", (IBookingRepository service) => service.GetAll());
 
-app.MapGet("/bookings/{id}", (int id, IBookingRepository service) => service.GetById(id));
+app.MapGet("/bookings/{id}", (IBookingRepository service, int id) => service.GetById(id));
 
-app.MapPost("/bookings", (Booking booking, IBookingRepository service) => service.Add(booking));
+app.MapPost("/bookings", (IBookingRepository service, Booking booking) => service.Add(booking));
 
-app.MapPut("/bookings/{id}", (Booking booking, IBookingRepository service) => service.Update(booking));
+app.MapPut("/bookings", (IBookingRepository service, Booking booking) => service.Update(booking));
 
-app.MapDelete("/bookings/{id}", (int id, IBookingRepository service) => service.Delete(id));
+app.MapDelete("/bookings/{id}", (IBookingRepository service, int id) => service.Delete(id));
 
 app.Run();
