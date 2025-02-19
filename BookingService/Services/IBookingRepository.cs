@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Http;
 public interface IBookingRepository
 {
 	IEnumerable<Booking> GetAll();
-	IResult GetById(int id);
-	IResult Add(Booking booking);
-	IResult Update(Booking booking);
-	IResult Delete(int id);
+	Booking? GetById(int id);
+	void Add(Booking booking);
+	void Update(Booking booking);
+	void Delete(int id);
 }

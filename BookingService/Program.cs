@@ -28,12 +28,31 @@ app.MapGet("/", () => "Hello World");
 
 app.MapGet("/bookings", (IBookingRepository service) => service.GetAll());
 
-app.MapGet("/bookings/{id}", (IBookingRepository service, int id) => service.GetById(id));
+app.MapGet("/bookings/{id}", (IBookingRepository service, int id) => {
+    var booking = service.GetById(id);
+    if (booking is null) return Results.NotFound("Booking not found");
+    return Results.Ok(booking);
+});
 
-app.MapPost("/bookings", (IBookingRepository service, Booking booking) => service.Add(booking));
+app.MapPost("/bookings", (IBookingRepository service, Booking booking) => {
+    var checkBooking = service.GetById(booking.Id);
+    if (checkBooking is not null) return Results.Problem("Booking with this id already exists");
+    service.Add(booking);
+    return Results.Created("Booking created", service.GetById(booking.Id)); //maybe return the input instead?
+});
 
-app.MapPut("/bookings", (IBookingRepository service, Booking booking) => service.Update(booking));
+app.MapPut("/bookings", (IBookingRepository service, Booking booking) => {
+    var checkBooking = service.GetById(booking.Id);
+    if (checkBooking is null) return Results.NotFound("Booking not found");
+    service.Update(booking);
+    return Results.Ok("Booking updated");
+});
 
-app.MapDelete("/bookings/{id}", (IBookingRepository service, int id) => service.Delete(id));
+app.MapDelete("/bookings/{id}", (IBookingRepository service, int id) => {
+    var checkBooking = service.GetById(id);
+    if (checkBooking is null) return Results.NotFound("Booking not found");
+    service.Delete(id);
+    return Results.Ok("Booking deleted");
+});
 
 app.Run();
