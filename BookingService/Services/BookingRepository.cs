@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.Http;
 
 public class BookingRepository : IBookingRepository
 {
@@ -19,24 +21,48 @@ public class BookingRepository : IBookingRepository
 		return bookings;
 	}
 
-	public Booking? GetById(int id)
+	public IResult GetById(int id)
 	{
+        var booking = bookings.FirstOrDefault(o => o.Id == id);
+        if (booking is null)
+        {
+            return Results.NotFound("Booking not found");
+        }
+        return Results.Ok(booking);
+    }
 
-	}
-
-	public void Add(Booking booking)
+	public IResult Add(Booking booking)
 	{
+        bookings.Add(booking);
 
-	}
+        return Results.Created("/bookings/{bookings.id}", booking);
+    }
 
-	public void Update(Booking booking)
+	public IResult Update(Booking booking)
 	{
+        var preupdate = bookings.FirstOrDefault(o => o.Id == booking.Id);
 
-	}
+        if (preupdate is null)
+        {
+            return Results.NotFound("Booking not found");
+        }
 
-	public void Delete(int id)
+        preupdate.CustomerId = booking.CustomerId;
+        preupdate.RoomId = booking.RoomId;
+
+        return Results.Ok("/bookings/{bookings.id} Updated");
+    }
+
+	public IResult Delete(int id)
 	{
+        var toBeDeleted = bookings.FirstOrDefault(o => o.Id == id);
+        if (toBeDeleted is null)
+        {
+            return Results.NotFound("Booking not found");
+        }
 
-	}
+        bookings.Remove(toBeDeleted);
+        return Results.Ok("Booking deleted");
+    }
 
 }

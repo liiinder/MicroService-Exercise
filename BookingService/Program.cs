@@ -23,47 +23,14 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.MapGet("/bookings", (IBookingRepository booking) => booking.GetAll());
+app.MapGet("/bookings", (IBookingRepository service) => service.GetAll());
 
-app.MapGet("/bookings/{id}", (int id) => {
-    var booking = bookings.FirstOrDefault(o => o.Id == id);
-    if (booking is null)
-    {
-        return Results.NotFound("Booking not found");
-    }
-    return Results.Ok(booking);
-});
+app.MapGet("/bookings/{id}", (int id, IBookingRepository service) => service.GetById(id));
 
-app.MapPost("/bookings", (Booking booking) => {
-    bookings.Add(booking);
+app.MapPost("/bookings", (Booking booking, IBookingRepository service) => service.Add(booking));
 
-    return Results.Created("/bookings/{bookings.id}", booking);
-});
+app.MapPut("/bookings/{id}", (Booking booking, IBookingRepository service) => service.Update(booking));
 
-app.MapPut("/bookings/{id}", (int id, Booking booking) => {
-    var preupdate = bookings.FirstOrDefault(o => o.Id == id);
-
-    if (preupdate is null)
-    {
-        return Results.NotFound("Booking not found");
-    }
-    
-    preupdate.CustomerId = booking.CustomerId;
-    preupdate.RoomId = booking.RoomId;
-
-    return Results.Ok("/bookings/{bookings.id} Updated");
-});
-
-app.MapDelete("/bookings/{id}", (int id) =>
-{
-    var toBeDeleted = bookings.FirstOrDefault(o => o.Id == id);
-    if (toBeDeleted is null)
-    {
-        return Results.NotFound("Booking not found");
-    }
-
-    bookings.Remove(toBeDeleted);
-    return Results.Ok("Booking deleted");
-});
+app.MapDelete("/bookings/{id}", (int id, IBookingRepository service) => service.Delete(id));
 
 app.Run();
