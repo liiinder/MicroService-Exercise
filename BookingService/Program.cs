@@ -1,17 +1,6 @@
-List<Booking> bookings = [
-    new Booking(1, 1, 2),
-    new Booking(2, 2, 1),
-    new Booking(3, 5, 2),
-    new Booking(4, 10, 3),
-    new Booking(5, 9, 2),
-    new Booking(6, 2, 1),
-    new Booking(7, 3, 1),
-    new Booking(8, 4, 3),
-    new Booking(9, 19, 1)
-];
-
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApiDocument(config =>
 {
@@ -34,7 +23,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.MapGet("/bookings", () => bookings);
+app.MapGet("/bookings", (IBookingRepository booking) => booking.GetAll());
 
 app.MapGet("/bookings/{id}", (int id) => {
     var booking = bookings.FirstOrDefault(o => o.Id == id);
