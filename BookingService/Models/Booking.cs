@@ -10,5 +10,4 @@ public class Booking {
         CustomerId = customerId;
         RoomId = roomId;
     }
-    
 }
